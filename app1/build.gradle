@@ -1,0 +1,15 @@
+plugins {
+    id "org.springframework.boot" version "2.1.4.RELEASE"
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-test'
+}
+
+bootJar {
+    mainClassName = 'com.github.torczuk.Application'
+}

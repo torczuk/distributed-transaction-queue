@@ -1,0 +1,20 @@
+plugins {
+    id "com.avast.gradle.docker-compose" version "0.9.1"
+}
+
+test {
+    useJUnitPlatform {
+        excludeTags("system")
+    }
+}
+
+task systemTest(type: Test) {}
+
+systemTest {
+    useJUnitPlatform {
+        includeTags("system")
+    }
+}
+
+check.dependsOn systemTest
+dockerCompose.isRequiredBy(systemTest)
