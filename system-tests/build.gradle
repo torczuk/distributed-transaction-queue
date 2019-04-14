@@ -2,6 +2,7 @@ plugins {
     id "com.avast.gradle.docker-compose" version "0.9.1"
 }
 
+
 test {
     useJUnitPlatform {
         excludeTags("system")
