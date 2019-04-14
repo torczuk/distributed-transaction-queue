@@ -20,7 +20,7 @@ internal class DistributedTxtSystemTest(
     private val log = LoggerFactory.getLogger(DistributedTxtSystemTest::class.java)
 
     @SystemTest
-    fun `should book successfully flight & hotel when components are available`() {
+    fun `should book successfully order when both components are are available`() {
         //given all components up and running
         //TODO check status
 
