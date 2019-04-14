@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 services:
   #  zookeeper:
   #    image: wurstmeister/zookeeper
@@ -25,5 +25,8 @@ services:
 #      context: ../app1
 #      dockerfile: Dockerfile
   app:
-    image: openjdk:11-slim
-    command: java -version
+    build:
+      context: ../app1/
+    ports:
+    - "8080:8080"
+    command: java -jar app.jar
