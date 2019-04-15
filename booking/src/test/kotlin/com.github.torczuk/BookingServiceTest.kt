@@ -9,9 +9,7 @@ import java.time.ZoneId
 import java.util.*
 
 internal class BookingServiceTest {
-    val queue = ArrayDeque<BookingEvent>()
-    val producer = InMemoryProducer(queue)
-    val consumer = InMemoryConsumer(queue)
+    val producer = InMemoryProducer()
     val clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"))
 
     val bookingService = BookingService(clock, producer)
@@ -24,7 +22,6 @@ internal class BookingServiceTest {
         val event = bookingService.create(transactionId)
 
         assertThat(event).isEqualTo(BookingEvent(transactionId, "created", expectedTimestamp))
-        assertThat(consumer.get()).isEqualTo(event)
+        assertThat(producer.publishedEvents().first).isEqualTo(event)
     }
-
 }

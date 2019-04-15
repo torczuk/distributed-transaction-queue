@@ -1,4 +1,4 @@
-package com.github.torczuk
+package com.github.torczuk.infractructure.http
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
