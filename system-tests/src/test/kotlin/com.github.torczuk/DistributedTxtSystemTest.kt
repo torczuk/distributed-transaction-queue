@@ -35,6 +35,42 @@ internal class DistributedTxtSystemTest(
 
     }
 
+    @SystemTest
+    fun `should book successfully order even when payment component is not available for defined number of time`() {
+        //given all components but payment up and running
+        //TODO check status
+
+        //when
+        val transaction = UUID.randomUUID().toString()
+        POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
+        //and
+        //payment component is up
+
+
+        //then
+        //TODO add avaitility
+        val response = GET("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
+        assertThat(response.body).isEqualTo("""{"status": "success"}""".trimIndent())
+    }
+
+    @SystemTest
+    fun `should book successfully order even when inventory component is not available for defined number of time`() {
+        //given all components but storage up and running
+        //TODO check status
+
+        //when
+        val transaction = UUID.randomUUID().toString()
+        POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
+        //and
+        //storage component is up
+
+
+        //then
+        //TODO add avaitility
+        val response = GET("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
+        assertThat(response.body).isEqualTo("""{"status": "success"}""".trimIndent())
+    }
+
     private fun POST(url: String): ResponseEntity<String> {
         log.info("POST: $url")
         return restTemplate.postForEntity<String>(
