@@ -9,7 +9,7 @@ class ProducerConfiguration {
         val props = Properties()
         props["bootstrap.servers"] = "localhost:9092"
         props["acks"] = "all"
-        props["retries"] = 0
+        props["retries"] = 100
         props["batch.size"] = 16384
         props["linger.ms"] = 1
         props["buffer.memory"] = 33554432
