@@ -5,6 +5,7 @@ import com.github.torczuk.domain.BookingEventRepository
 import org.springframework.stereotype.Repository
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 
 @Repository
 class FileBasedBookingEventRepository(path: String) : BookingEventRepository {
@@ -23,7 +24,9 @@ class FileBasedBookingEventRepository(path: String) : BookingEventRepository {
     }
 
     override fun save(event: BookingEvent) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Files.write(location.resolve(event.transaction),
+                event.toString().toByteArray(Charsets.UTF_8),
+                StandardOpenOption.CREATE)
     }
 
 }
