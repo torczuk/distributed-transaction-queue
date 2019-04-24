@@ -17,7 +17,10 @@ class FileBasedBookingEventRepository(path: String) : BookingEventRepository {
     }
 
     override fun findAll(): List<BookingEvent> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Files.list(location)
+                .map { file -> file.fileName.toFile().name.split("_") }
+                .map { list -> BookingEvent(list[0], list[1]) }
+                .collect(toList())
     }
 
     override fun findBy(transactionId: String): List<BookingEvent> {

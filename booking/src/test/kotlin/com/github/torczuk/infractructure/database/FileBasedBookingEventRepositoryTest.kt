@@ -51,7 +51,7 @@ class FileBasedBookingEventRepositoryTest {
     }
 
     @Test
-    fun `should find transaction by id`() {
+    fun `should find event by transaction id`() {
         val transaction = UUID.randomUUID().toString()
         val createdEvent = BookingEvent(transaction)
         val cancelledEvent = BookingEvent(transaction, "canceled")
@@ -62,5 +62,21 @@ class FileBasedBookingEventRepositoryTest {
 
         assertThat(events).hasSize(2)
         assertThat(events).contains(createdEvent, cancelledEvent)
+    }
+
+    @Test
+    fun `should find all events`() {
+        val transaction = UUID.randomUUID().toString()
+        val createdEvent = BookingEvent(transaction)
+        val cancelledEvent = BookingEvent(transaction, "canceled")
+        val otherEvent = BookingEvent(UUID.randomUUID().toString())
+        repository.save(createdEvent)
+        repository.save(cancelledEvent)
+        repository.save(otherEvent)
+
+        val events = repository.findAll()
+
+        assertThat(events).hasSize(3)
+        assertThat(events).contains(createdEvent, cancelledEvent, otherEvent)
     }
 }
