@@ -3,6 +3,8 @@ package com.github.torczuk
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventRepository
 import com.github.torczuk.domain.EventProducer
+import com.github.torczuk.util.Stubs
+import com.github.torczuk.util.Stubs.Companion.uuid
 import org.awaitility.Awaitility.await
 import org.awaitility.Duration.ONE_MINUTE
 import org.awaitility.Duration.ONE_SECOND
@@ -24,7 +26,7 @@ internal class KafkaProducerConsumerIntegrationTest(
     @Test
     fun `published booking event on topic should be eventually consumed by consumer listening on this topic`() {
         val now = Instant.now().toEpochMilli()
-        val bookingEvent = BookingEvent(transaction = UUID.randomUUID().toString(), timestamp = now)
+        val bookingEvent = BookingEvent(transaction = uuid(), timestamp = now)
 
         publisher.publish(bookingEvent)
 

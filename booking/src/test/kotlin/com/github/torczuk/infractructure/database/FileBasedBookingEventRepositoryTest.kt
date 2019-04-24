@@ -4,37 +4,38 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventRepository
+import com.github.torczuk.util.Stubs.Companion.uuid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.rules.TemporaryFolder
-import java.util.*
 
 class FileBasedBookingEventRepositoryTest {
 
     @Rule
-    val tempDir = TemporaryFolder()
-    val mapper = ObjectMapper().registerModule(KotlinModule())
-    lateinit var repository: BookingEventRepository
+    private val tempDir = TemporaryFolder()
+    private val mapper = ObjectMapper().registerModule(KotlinModule())
+    private lateinit var repository: BookingEventRepository
+    private val dbFolderName = "db"
 
     @BeforeEach
     internal fun setUp() {
         tempDir.create()
-        val newFile = tempDir.newFolder("db")
+        val newFile = tempDir.newFolder(dbFolderName)
         repository = FileBasedBookingEventRepository(newFile.absolutePath, mapper)
     }
 
     @Test
     fun `should return false when transaction does not exist`() {
-        val nonExistingTransaction = UUID.randomUUID().toString()
+        val nonExistingTransaction = uuid()
 
         assertThat(repository.exist(nonExistingTransaction)).isFalse()
     }
 
     @Test
     fun `should return true when transaction exist`() {
-        val newTransaction = UUID.randomUUID().toString()
+        val newTransaction = uuid()
 
         repository.save(BookingEvent(newTransaction))
 
@@ -43,19 +44,19 @@ class FileBasedBookingEventRepositoryTest {
 
     @Test
     fun `should return empty collection when event can not be found by id`() {
-        val event1 = BookingEvent(UUID.randomUUID().toString())
-        val event2 = BookingEvent(UUID.randomUUID().toString())
+        val event1 = BookingEvent(uuid())
+        val event2 = BookingEvent(uuid())
         repository.save(event1)
         repository.save(event2)
 
-        val foundedEvent = repository.findBy(UUID.randomUUID().toString())
+        val foundedEvent = repository.findBy(uuid())
 
         assertThat(foundedEvent).isEmpty()
     }
 
     @Test
     fun `should find event by transaction id`() {
-        val transaction = UUID.randomUUID().toString()
+        val transaction = uuid()
         val createdEvent = BookingEvent(transaction)
         val cancelledEvent = BookingEvent(transaction, "canceled")
         repository.save(createdEvent)
@@ -69,10 +70,10 @@ class FileBasedBookingEventRepositoryTest {
 
     @Test
     fun `should find all events`() {
-        val transaction = UUID.randomUUID().toString()
+        val transaction = uuid()
         val createdEvent = BookingEvent(transaction)
         val cancelledEvent = BookingEvent(transaction, "canceled")
-        val otherEvent = BookingEvent(UUID.randomUUID().toString())
+        val otherEvent = BookingEvent(uuid())
         repository.save(createdEvent)
         repository.save(cancelledEvent)
         repository.save(otherEvent)
@@ -85,7 +86,7 @@ class FileBasedBookingEventRepositoryTest {
 
     @Test
     fun `save should be idempotent`() {
-        val event = BookingEvent(UUID.randomUUID().toString())
+        val event = BookingEvent(uuid())
         repository.save(event)
         repository.save(event)
 
