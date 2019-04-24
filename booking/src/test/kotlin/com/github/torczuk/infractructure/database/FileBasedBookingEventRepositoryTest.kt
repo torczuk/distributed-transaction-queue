@@ -49,4 +49,16 @@ class FileBasedBookingEventRepositoryTest {
 
         assertThat(foundedEvent).isNull()
     }
+
+    @Test
+    fun `should find transaction by id`() {
+        val event1 = BookingEvent(UUID.randomUUID().toString())
+        val event2 = BookingEvent(UUID.randomUUID().toString(), "canceled")
+        repository.save(event1)
+        repository.save(event2)
+
+        val foundedEvent = repository.findBy(event2.transaction)
+
+        assertThat(foundedEvent).isEqualTo(event2)
+    }
 }

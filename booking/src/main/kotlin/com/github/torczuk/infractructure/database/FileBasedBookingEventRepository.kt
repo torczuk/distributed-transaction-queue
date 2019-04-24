@@ -12,7 +12,7 @@ class FileBasedBookingEventRepository(path: String) : BookingEventRepository {
     val location = Paths.get(path)
 
     override fun exist(transactionId: String): Boolean {
-        return Files.list(location).anyMatch { file -> file.fileName.toFile().name == transactionId }
+        return Files.list(location).anyMatch { file -> file.fileName.toFile().name.startsWith(transactionId) }
     }
 
     override fun findAll(): List<BookingEvent> {
@@ -21,16 +21,16 @@ class FileBasedBookingEventRepository(path: String) : BookingEventRepository {
 
     override fun findBy(transactionId: String): BookingEvent? {
         return Files.list(location)
-                .filter { file -> file.fileName.toFile().name == transactionId }
+                .filter { file -> file.fileName.toFile().name.startsWith(transactionId) }
+                .map { file -> file.fileName.toFile().name.split("_") }
+                .map { list -> BookingEvent(list[0], list[1]) }
                 .findFirst()
-                .map { file -> BookingEvent(transactionId) }
                 .orElse(null)
     }
 
     override fun save(event: BookingEvent) {
-        Files.write(location.resolve(event.transaction),
+        Files.write(location.resolve("${event.transaction}_${event.type}"),
                 event.toString().toByteArray(Charsets.UTF_8),
                 StandardOpenOption.CREATE)
     }
-
 }
