@@ -3,7 +3,6 @@ package com.github.torczuk.infractructure.database
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,5 +36,17 @@ class FileBasedBookingEventRepositoryTest {
         repository.save(BookingEvent(newTransaction))
 
         assertThat(repository.exist(newTransaction)).isTrue()
+    }
+
+    @Test
+    fun `should return null when event can not be found by id`() {
+        val event1 = BookingEvent(UUID.randomUUID().toString())
+        val event2 = BookingEvent(UUID.randomUUID().toString())
+        repository.save(event1)
+        repository.save(event2)
+
+        val foundedEvent = repository.findBy(UUID.randomUUID().toString())
+
+        assertThat(foundedEvent).isNull()
     }
 }
