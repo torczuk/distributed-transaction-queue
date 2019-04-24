@@ -79,4 +79,16 @@ class FileBasedBookingEventRepositoryTest {
         assertThat(events).hasSize(3)
         assertThat(events).contains(createdEvent, cancelledEvent, otherEvent)
     }
+
+    @Test
+    fun `save should be idempotent`() {
+        val event = BookingEvent(UUID.randomUUID().toString())
+        repository.save(event)
+        repository.save(event)
+
+        val events = repository.findAll()
+
+        assertThat(events).hasSize(1)
+        assertThat(events).contains(event)
+    }
 }
