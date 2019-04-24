@@ -4,7 +4,7 @@ interface BookingEventRepository {
 
     fun save(event: BookingEvent)
 
-    fun findBy(transactionId: String): BookingEvent?
+    fun findBy(transactionId: String): List<BookingEvent>
 
     fun exist(transactionId: String): Boolean
 

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+import java.util.stream.Collectors.toList
 
 @Repository
 class FileBasedBookingEventRepository(path: String) : BookingEventRepository {
@@ -19,13 +20,12 @@ class FileBasedBookingEventRepository(path: String) : BookingEventRepository {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun findBy(transactionId: String): BookingEvent? {
+    override fun findBy(transactionId: String): List<BookingEvent> {
         return Files.list(location)
                 .filter { file -> file.fileName.toFile().name.startsWith(transactionId) }
                 .map { file -> file.fileName.toFile().name.split("_") }
                 .map { list -> BookingEvent(list[0], list[1]) }
-                .findFirst()
-                .orElse(null)
+                .collect(toList())
     }
 
     override fun save(event: BookingEvent) {

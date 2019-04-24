@@ -39,7 +39,7 @@ class FileBasedBookingEventRepositoryTest {
     }
 
     @Test
-    fun `should return null when event can not be found by id`() {
+    fun `should return empty collection when event can not be found by id`() {
         val event1 = BookingEvent(UUID.randomUUID().toString())
         val event2 = BookingEvent(UUID.randomUUID().toString())
         repository.save(event1)
@@ -47,18 +47,20 @@ class FileBasedBookingEventRepositoryTest {
 
         val foundedEvent = repository.findBy(UUID.randomUUID().toString())
 
-        assertThat(foundedEvent).isNull()
+        assertThat(foundedEvent).isEmpty()
     }
 
     @Test
     fun `should find transaction by id`() {
-        val event1 = BookingEvent(UUID.randomUUID().toString())
-        val event2 = BookingEvent(UUID.randomUUID().toString(), "canceled")
-        repository.save(event1)
-        repository.save(event2)
+        val transaction = UUID.randomUUID().toString()
+        val createdEvent = BookingEvent(transaction)
+        val cancelledEvent = BookingEvent(transaction, "canceled")
+        repository.save(createdEvent)
+        repository.save(cancelledEvent)
 
-        val foundedEvent = repository.findBy(event2.transaction)
+        val events = repository.findBy(cancelledEvent.transaction)
 
-        assertThat(foundedEvent).isEqualTo(event2)
+        assertThat(events).hasSize(2)
+        assertThat(events).contains(createdEvent, cancelledEvent)
     }
 }

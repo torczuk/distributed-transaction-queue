@@ -7,7 +7,7 @@ class InMemoryBookingEventRepository : BookingEventRepository {
 
     private val events = mutableListOf<BookingEvent>()
 
-    override fun findBy(transactionId: String) = events.findLast { event -> event.transaction == transactionId }
+    override fun findBy(transactionId: String) = events.filter { event -> event.transaction == transactionId }
 
     override fun exist(transactionId: String) = events.any { event -> event.transaction == transactionId }
 
