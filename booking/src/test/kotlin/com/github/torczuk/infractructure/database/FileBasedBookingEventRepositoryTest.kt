@@ -1,5 +1,7 @@
 package com.github.torczuk.infractructure.database
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -13,13 +15,14 @@ class FileBasedBookingEventRepositoryTest {
 
     @Rule
     val tempDir = TemporaryFolder()
+    val mapper = ObjectMapper().registerModule(KotlinModule())
     lateinit var repository: BookingEventRepository
 
     @BeforeEach
     internal fun setUp() {
         tempDir.create()
         val newFile = tempDir.newFolder("db")
-        repository = FileBasedBookingEventRepository(newFile.absolutePath)
+        repository = FileBasedBookingEventRepository(newFile.absolutePath, mapper)
     }
 
     @Test
