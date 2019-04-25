@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import java.time.Clock
+import java.time.ZoneId
 
 
 @Configuration
@@ -50,6 +52,8 @@ class AppConfiguration {
     fun listener(bookingEventRepository: BookingEventRepository): EventListener {
         log.info("Injecting booking repository  {}", bookingEventRepository.javaClass)
         return BookingEventListener(bookingEventRepository)
-
     }
+
+    @Bean
+    fun clock() = Clock.system(ZoneId.of("UTC"))
 }

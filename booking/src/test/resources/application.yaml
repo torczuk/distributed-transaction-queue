@@ -1,4 +1,4 @@
 application:
   file-based-db:
     path: /tmp/test/db/
-#spring.main.allow-bean-definition-overriding:   true
+spring.main.allow-bean-definition-overriding:   true
