@@ -1,5 +1,6 @@
-package com.github.torczuk
+package com.github.torczuk.infractructure.http
 
+import com.github.torczuk.NoStartEventConsumer
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventRepository
 import com.github.torczuk.domain.EventProducer
@@ -23,7 +24,7 @@ import java.time.Instant
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = [NoStartEventConsumer::class])
-internal class TransactionControllerTest(
+class TransactionControllerTest(
         @Autowired private val restTemplate: TestRestTemplate,
         @LocalServerPort private val randomServerPort: Int,
         @Autowired val clock: Clock) {
