@@ -3,7 +3,6 @@ package com.github.torczuk
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventRepository
 import com.github.torczuk.domain.EventProducer
-import com.github.torczuk.util.Stubs
 import com.github.torczuk.util.Stubs.Companion.uuid
 import org.awaitility.Awaitility.await
 import org.awaitility.Duration.ONE_MINUTE
@@ -14,9 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import java.time.Instant
-import java.util.*
 
-@SpringBootTest(webEnvironment = RANDOM_PORT, classes = [TestContext::class])
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 internal class KafkaProducerConsumerIntegrationTest(
         @Autowired val publisher: EventProducer,
         @Autowired val bookingEventRepository: BookingEventRepository

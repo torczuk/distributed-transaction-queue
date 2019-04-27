@@ -2,7 +2,6 @@ package com.github.torczuk.infractructure.http
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.torczuk.TestContext
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.util.HttpTest
 import com.github.torczuk.util.Stubs.Companion.uuid
@@ -12,10 +11,11 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.server.LocalServerPort
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [TestContext::class])
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 class TransactionControllerIntegrationTest(
         @Autowired override val restTemplate: TestRestTemplate,
         @LocalServerPort override val serverPort: Int,
