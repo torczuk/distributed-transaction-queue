@@ -4,6 +4,7 @@ import com.github.torczuk.NoStartEventConsumer
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventRepository
 import com.github.torczuk.domain.EventProducer
+import com.github.torczuk.util.HttpTest
 import com.github.torczuk.util.Stubs.Companion.uuid
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -25,9 +26,9 @@ import java.time.Instant
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = [NoStartEventConsumer::class])
 class TransactionControllerTest(
-        @Autowired private val restTemplate: TestRestTemplate,
-        @LocalServerPort private val randomServerPort: Int,
-        @Autowired val clock: Clock) {
+        @Autowired override val restTemplate: TestRestTemplate,
+        @LocalServerPort override val serverPort: Int,
+        @Autowired val clock: Clock) : HttpTest {
 
     @MockBean
     private lateinit var repository: BookingEventRepository
@@ -56,13 +57,4 @@ class TransactionControllerTest(
         assertThat(response.statusCode).isEqualTo(OK)
         assertThat(response.body).isEqualTo("""[{"transaction":"$transaction","type":"created","timestamp":$now}]""".trimIndent())
     }
-
-    private fun POST(uri: String) = restTemplate.postForEntity<String>(
-            "http://localhost:$randomServerPort/$uri",
-            null,
-            String::class.java)
-
-    private fun GET(uri: String) = restTemplate.getForEntity(
-            "http://localhost:$randomServerPort/$uri",
-            String::class.java)
 }
