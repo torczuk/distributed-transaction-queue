@@ -2,6 +2,7 @@ package com.github.torczuk.infractructure.http
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.github.torczuk.Application
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.util.HttpTest
 import com.github.torczuk.util.Stubs.Companion.uuid
@@ -26,6 +27,7 @@ class TransactionControllerIntegrationTest(
     @Test
     fun `transaction POSTed on the transaction endpoint should eventually be available by GET`() {
         val transaction = uuid()
+        log.info("POST $transaction ...")
         val response = POST("/api/v1/transaction/$transaction")
 
         await("posted transaction is available").pollDelay(Duration.ONE_SECOND).atMost(Duration.ONE_MINUTE).until {

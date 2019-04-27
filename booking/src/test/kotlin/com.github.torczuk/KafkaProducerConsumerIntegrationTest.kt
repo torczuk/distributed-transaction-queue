@@ -25,6 +25,7 @@ internal class KafkaProducerConsumerIntegrationTest(
     fun `published booking event on topic should be eventually consumed by consumer listening on this topic`() {
         val now = Instant.now().toEpochMilli()
         val bookingEvent = BookingEvent(transaction = uuid(), timestamp = now)
+        log.info("publishing $bookingEvent")
 
         publisher.publish(bookingEvent)
 

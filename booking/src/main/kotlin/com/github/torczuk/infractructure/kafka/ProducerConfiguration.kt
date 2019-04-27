@@ -7,7 +7,7 @@ import java.util.*
 class ProducerConfiguration {
     fun properties(): Properties {
         val props = Properties()
-        props["bootstrap.servers"] = "localhost:9092"
+        props["bootstrap.servers"] = bootstrapServer()
         props["acks"] = "all"
         props["retries"] = 100
         props["batch.size"] = 16384
@@ -18,4 +18,5 @@ class ProducerConfiguration {
         return props
     }
 
+    fun bootstrapServer() = System.getenv("KAFKA_SERVER") ?: "localhost:9092"
 }

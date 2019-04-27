@@ -46,6 +46,7 @@ systemTest {
 
 dockerCompose {
     captureContainersOutput = false
+    forceRecreate = true
 }
 
 check.dependsOn systemTest

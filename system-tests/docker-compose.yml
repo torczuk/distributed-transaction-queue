@@ -1,29 +1,36 @@
 version: '3.7'
 services:
-  #  zookeeper:
-  #    image: wurstmeister/zookeeper
-  #    ports:
-  #    - "2181"
-  #    hostname: zookeeper
-  #  kafka:
-  #    image: wurstmeister/kafka
-  #    command: [start-kafka.sh]
-  #    ports:
-  #    - "9092"
-  #    hostname: kafka
-  #    environment:
-  #      KAFKA_CREATE_TOPICS: "UploadFile:1:1,GetFile:1:1,TrackUpload:1:1,GetEmailContent:1:1" # topic:partition:replicas
-  #      KAFKA_ADVERTISED_HOST_NAME: kafka # docker-machine ip
-  #      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-  #      KAFKA_ADVERTISED_PORT: 9092
-  #    volumes:
-  #    - /var/run/docker.sock:/var/run/docker.sock
-  #    depends_on:
-  #    - "zookeeper"
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    ports:
+    - "2181:2181"
+    hostname: zookeeper
+  kafka:
+    image: wurstmeister/kafka:2.11-1.1.1
+    command: [start-kafka.sh]
+    ports:
+    - "9092:9092"
+    hostname: kafka
+    environment:
+      KAFKA_CREATE_TOPICS: "booking_events:1:1"
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_BROKER_ID: 0
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+    - "zookeeper"
   booking:
-    container_name: booking_test
+    container_name: system_test_booking
     build:
       context: ../booking/
     ports:
     - "8080:8080"
+    environment:
+    - KAFKA_SERVER=kafka:9092
     command: java -jar booking.jar
+    depends_on:
+    - "kafka"
+    links:
+    - kafka
