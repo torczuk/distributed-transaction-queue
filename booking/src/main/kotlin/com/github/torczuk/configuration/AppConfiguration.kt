@@ -2,6 +2,7 @@ package com.github.torczuk.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.BookingEventListener
 import com.github.torczuk.domain.BookingEventRepository
 import com.github.torczuk.domain.EventListener
@@ -42,14 +43,14 @@ class AppConfiguration {
     }
 
     @Bean
-    fun kafkaEventConsumer(listener: EventListener, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer {
+    fun kafkaEventConsumer(listener: EventListener<BookingEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer {
         val consumer = KafkaEventConsumer(listener, ConsumerConfiguration(), objectMapper, "booking_events")
         threadPoolTaskExecutor.execute(consumer)
         return consumer
     }
 
     @Bean
-    fun listener(bookingEventRepository: BookingEventRepository): EventListener {
+    fun listener(bookingEventRepository: BookingEventRepository): EventListener<BookingEvent> {
         log.info("Injecting booking repository  {}", bookingEventRepository.javaClass)
         return BookingEventListener(bookingEventRepository)
     }

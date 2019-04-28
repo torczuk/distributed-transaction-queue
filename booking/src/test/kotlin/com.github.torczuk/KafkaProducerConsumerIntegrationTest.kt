@@ -16,7 +16,7 @@ import java.time.Instant
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 internal class KafkaProducerConsumerIntegrationTest(
-        @Autowired val publisher: EventProducer,
+        @Autowired val publisher: EventProducer<BookingEvent>,
         @Autowired val bookingEventRepository: BookingEventRepository
 ) {
     private val log = LoggerFactory.getLogger(KafkaProducerConsumerIntegrationTest::class.java)

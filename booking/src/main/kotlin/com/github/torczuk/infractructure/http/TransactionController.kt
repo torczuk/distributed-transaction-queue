@@ -11,7 +11,7 @@ import java.time.Clock
 @RestController
 @RequestMapping(path = ["api/v1/transaction"])
 class TransactionController(@Autowired val bookingEventRepository: BookingEventRepository,
-                            @Autowired val eventProducer: EventProducer,
+                            @Autowired val eventProducer: EventProducer<BookingEvent>,
                             @Autowired val clock: Clock) {
 
     @PostMapping(path = ["/{id}"])

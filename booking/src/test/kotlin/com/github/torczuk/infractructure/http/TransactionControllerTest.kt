@@ -33,7 +33,7 @@ class TransactionControllerTest(
     @MockBean
     private lateinit var repository: BookingEventRepository
     @MockBean
-    private lateinit var eventProducer: EventProducer
+    private lateinit var eventProducer: EventProducer<BookingEvent>
 
     @Test
     fun shouldAcceptTransactionToBeProcessedAndResponseWithStatusLocation() {

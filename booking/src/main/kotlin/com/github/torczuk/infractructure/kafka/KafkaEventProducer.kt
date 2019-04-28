@@ -9,13 +9,13 @@ import org.slf4j.LoggerFactory
 
 class KafkaEventProducer(config: ProducerConfiguration,
                          private val topic: String,
-                         val objectMapper: ObjectMapper) : EventProducer {
+                         val objectMapper: ObjectMapper) : EventProducer<BookingEvent> {
 
     val producer = KafkaProducer<String, String>(config.properties())
     val log = LoggerFactory.getLogger(KafkaEventProducer::class.java)
 
-    override fun publish(bookingEvent: BookingEvent) {
-        producer.send(ProducerRecord(topic, bookingEvent.transaction, objectMapper.writeValueAsString(bookingEvent)))
-        log.info("published on {}:  {}", topic, bookingEvent);
+    override fun publish(event: BookingEvent) {
+        producer.send(ProducerRecord(topic, event.transaction, objectMapper.writeValueAsString(event)))
+        log.info("published on {}:  {}", topic, event);
     }
 }

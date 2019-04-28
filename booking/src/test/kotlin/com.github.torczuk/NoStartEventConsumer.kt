@@ -1,6 +1,7 @@
 package com.github.torczuk
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.domain.EventListener
 import com.github.torczuk.infractructure.kafka.ConsumerConfiguration
 import com.github.torczuk.infractructure.kafka.KafkaEventConsumer
@@ -14,7 +15,7 @@ import java.time.ZoneId
 @TestConfiguration
 class NoStartEventConsumer {
     @Bean
-    fun kafkaEventConsumer(listener: EventListener, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor) = KafkaEventConsumer(listener, ConsumerConfiguration(), objectMapper, "booking_events")
+    fun kafkaEventConsumer(listener: EventListener<BookingEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor) = KafkaEventConsumer(listener, ConsumerConfiguration(), objectMapper, "booking_events")
 
     @Bean
     fun clock() = Clock.fixed(Instant.now(), ZoneId.of("UTC"))

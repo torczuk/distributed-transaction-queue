@@ -1,5 +1,5 @@
 package com.github.torczuk.domain
 
-interface EventProducer {
-    fun publish(bookingEvent: BookingEvent)
+interface EventProducer<in T : Event> {
+    fun publish(event: T)
 }
