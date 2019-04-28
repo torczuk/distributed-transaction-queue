@@ -1,6 +1,10 @@
 package com.github.torczuk
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility
+import org.awaitility.Duration
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -12,9 +16,9 @@ import java.util.*
 @SpringBootTest(classes = [Application::class])
 internal class DistributedTxtSystemTest(
         @Autowired val restTemplate: RestTemplate,
-
-        @Value("\${booking_test.tcp.8080}") val bookingPort: String,
-        @Value("\${booking_test.host}") val bookingHost: String
+        @Autowired val objectMapper: ObjectMapper,
+        @Value("\${system_test_booking.tcp.8080}") val bookingPort: String,
+        @Value("\${system_test_booking.host}") val bookingHost: String
 ) {
 
     private val log = LoggerFactory.getLogger(DistributedTxtSystemTest::class.java)
@@ -26,13 +30,14 @@ internal class DistributedTxtSystemTest(
 
         //when
         val transaction = UUID.randomUUID().toString()
-        POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
 
-        //then
-        //TODO add avaitility
-        val response = GET("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
-        assertThat(response.body).isEqualTo("""{"status": "success"}""".trimIndent())
 
+        Awaitility.await("posted transaction is available").pollDelay(Duration.ONE_SECOND).atMost(Duration.ONE_MINUTE).until {
+            val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
+            log.info("status for {}: {}", transaction, statuses.body)
+            containsTransaction(statuses.body, transaction)
+        }
     }
 
     @SystemTest
@@ -80,6 +85,13 @@ internal class DistributedTxtSystemTest(
     private fun GET(url: String): ResponseEntity<String> {
         log.info("GET: $url")
         return restTemplate.getForEntity(url, String::class.java)
+    }
+
+    private fun location(body: String?) = objectMapper.readValue<Map<String, String>>(body!!)["location"]!!
+
+    private fun containsTransaction(body: String?, transactionId: String): Boolean {
+        return body?.contains(transactionId, true).let { false }
+                && body?.contains("success", true).let { false }
     }
 }
 

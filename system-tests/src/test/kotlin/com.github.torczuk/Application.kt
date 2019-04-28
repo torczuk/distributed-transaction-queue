@@ -1,5 +1,7 @@
 package com.github.torczuk
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.WebApplicationType
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -20,4 +22,9 @@ class Application {
     @Bean
     fun restTemplate() = RestTemplate()
 
+    @Bean
+    fun objecMapper() {
+        val objectMapper = ObjectMapper()
+        objectMapper.registerModule(KotlinModule())
+    }
 }
