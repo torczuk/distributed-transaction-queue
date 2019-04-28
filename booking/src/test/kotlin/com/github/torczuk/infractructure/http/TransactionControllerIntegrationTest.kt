@@ -2,7 +2,6 @@ package com.github.torczuk.infractructure.http
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.torczuk.Application
 import com.github.torczuk.domain.BookingEvent
 import com.github.torczuk.util.HttpTest
 import com.github.torczuk.util.Stubs.Companion.uuid

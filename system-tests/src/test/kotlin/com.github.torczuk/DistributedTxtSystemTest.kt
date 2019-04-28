@@ -2,6 +2,7 @@ package com.github.torczuk
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.github.torczuk.domain.BookingEvent
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.awaitility.Duration
@@ -90,8 +91,10 @@ internal class DistributedTxtSystemTest(
     private fun location(body: String?) = objectMapper.readValue<Map<String, String>>(body!!)["location"]!!
 
     private fun containsTransaction(body: String?, transactionId: String): Boolean {
-        return body?.contains(transactionId, true).let { false }
-                && body?.contains("success", true).let { false }
+        val bookings: List<BookingEvent> = objectMapper.readValue(body!!)
+        return bookings.filter { event -> event.transaction == transactionId }
+                .filter {event -> event.type == "success" }
+                .any()
     }
 }
 
