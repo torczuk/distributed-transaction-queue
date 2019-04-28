@@ -1,0 +1,50 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+plugins {
+    id "com.avast.gradle.docker-compose" version "0.9.1"
+}
+
+apply plugin: 'kotlin-spring'
+apply plugin: 'kotlin-allopen'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+
+dependencies {
+    implementation project(':domain')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '1.1.1'
+
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude module: 'junit'
+    }
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+}
+
+dockerCompose {
+    captureContainersOutput = false
+    useComposeFiles = ['src/test/resources/docker-compose.yml']
+//    stopContainers = false
+//    removeContainers = false
+
+}
+
+dockerCompose.isRequiredBy(test)
+
+test.doFirst {
+    dockerCompose.exposeAsEnvironment(test)
+    dockerCompose.exposeAsSystemProperties(test)
+}

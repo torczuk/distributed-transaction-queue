@@ -1,3 +1,4 @@
 include 'domain'
 include 'booking'
+include 'order'
 include 'system-tests'
