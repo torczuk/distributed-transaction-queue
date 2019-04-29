@@ -2,10 +2,7 @@ package com.github.torczuk.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.github.torczuk.domain.BookingEvent
-import com.github.torczuk.domain.BookingEventListener
-import com.github.torczuk.domain.BookingEventRepository
-import com.github.torczuk.domain.EventListener
+import com.github.torczuk.domain.*
 import com.github.torczuk.infractructure.kafka.ConsumerConfiguration
 import com.github.torczuk.infractructure.kafka.KafkaEventConsumer
 import com.github.torczuk.infractructure.kafka.KafkaEventProducer
@@ -30,7 +27,7 @@ class AppConfiguration {
     }
 
     @Bean
-    fun eventProducer(objectMapper: ObjectMapper) = KafkaEventProducer(ProducerConfiguration(), "booking_events", objectMapper)
+    fun bookingEventProducer(objectMapper: ObjectMapper) = KafkaEventProducer<BookingEvent>(ProducerConfiguration(), "booking_events", objectMapper)
 
     @Bean
     fun kafkaThreadExecutor(): ThreadPoolTaskExecutor {
