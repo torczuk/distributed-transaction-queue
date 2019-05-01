@@ -37,8 +37,8 @@ dependencies {
 dockerCompose {
     captureContainersOutput = false
     useComposeFiles = ['src/test/resources/docker-compose.yml']
-//    stopContainers = false
-//    removeContainers = false
+    stopContainers = false
+    removeContainers = false
 
 }
 

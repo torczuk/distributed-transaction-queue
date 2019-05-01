@@ -15,7 +15,9 @@ import java.time.ZoneId
 @TestConfiguration
 class NoStartEventConsumer {
     @Bean
-    fun kafkaEventConsumer(listener: EventListener<BookingEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor) = KafkaEventConsumer(listener, ConsumerConfiguration(), objectMapper, "booking_events")
+    fun kafkaBookingEventConsumer(bookingEventListener: EventListener<BookingEvent>,
+                                  objectMapper: ObjectMapper,
+                                  threadPoolTaskExecutor: ThreadPoolTaskExecutor) = KafkaEventConsumer(bookingEventListener, ConsumerConfiguration(), objectMapper, "booking_events", BookingEvent::class.java)
 
     @Bean
     fun clock() = Clock.fixed(Instant.now(), ZoneId.of("UTC"))

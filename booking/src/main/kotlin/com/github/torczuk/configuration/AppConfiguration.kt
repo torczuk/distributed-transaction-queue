@@ -2,7 +2,10 @@ package com.github.torczuk.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.github.torczuk.domain.*
+import com.github.torczuk.domain.BookingEvent
+import com.github.torczuk.domain.BookingEventListener
+import com.github.torczuk.domain.BookingEventRepository
+import com.github.torczuk.domain.EventListener
 import com.github.torczuk.infractructure.kafka.ConsumerConfiguration
 import com.github.torczuk.infractructure.kafka.KafkaEventConsumer
 import com.github.torczuk.infractructure.kafka.KafkaEventProducer
@@ -40,14 +43,20 @@ class AppConfiguration {
     }
 
     @Bean
-    fun kafkaEventConsumer(listener: EventListener<BookingEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer {
-        val consumer = KafkaEventConsumer(listener, ConsumerConfiguration(), objectMapper, "booking_events")
+    fun kafkaBookingEventConsumer(bookingEventListener: EventListener<BookingEvent>,
+                                  objectMapper: ObjectMapper,
+                                  threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<BookingEvent> {
+        val consumer = KafkaEventConsumer(bookingEventListener,
+                ConsumerConfiguration(),
+                objectMapper,
+                "booking_events",
+                BookingEvent::class.java)
         threadPoolTaskExecutor.execute(consumer)
         return consumer
     }
 
     @Bean
-    fun listener(bookingEventRepository: BookingEventRepository): EventListener<BookingEvent> {
+    fun bookingEventListener(bookingEventRepository: BookingEventRepository): EventListener<BookingEvent> {
         log.info("Injecting booking repository  {}", bookingEventRepository.javaClass)
         return BookingEventListener(bookingEventRepository)
     }
