@@ -2,10 +2,7 @@ package com.github.torczuk.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.github.torczuk.domain.BookingEvent
-import com.github.torczuk.domain.BookingEventListener
-import com.github.torczuk.domain.BookingEventRepository
-import com.github.torczuk.domain.EventListener
+import com.github.torczuk.domain.*
 import com.github.torczuk.infractructure.kafka.ConsumerConfiguration
 import com.github.torczuk.infractructure.kafka.KafkaEventConsumer
 import com.github.torczuk.infractructure.kafka.KafkaEventProducer
@@ -35,8 +32,8 @@ class AppConfiguration {
     @Bean
     fun kafkaThreadExecutor(): ThreadPoolTaskExecutor {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 1
-        executor.maxPoolSize = 1
+        executor.corePoolSize = 2
+        executor.maxPoolSize = 2
         executor.setThreadNamePrefix("kafka_listener")
         executor.initialize()
         return executor
@@ -56,10 +53,24 @@ class AppConfiguration {
     }
 
     @Bean
-    fun bookingEventListener(bookingEventRepository: BookingEventRepository): EventListener<BookingEvent> {
-        log.info("Injecting booking repository  {}", bookingEventRepository.javaClass)
-        return BookingEventListener(bookingEventRepository)
+    fun bookingEventListener(bookingEventRepository: BookingEventRepository): EventListener<BookingEvent> = BookingEventListener(bookingEventRepository)
+
+    @Bean
+    fun kafkaOrderEventConsumer(orderEventListener: EventListener<OrderEvent>,
+                                objectMapper: ObjectMapper,
+                                threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<OrderEvent> {
+        val consumer = KafkaEventConsumer(orderEventListener,
+                ConsumerConfiguration(),
+                objectMapper,
+                "order_events",
+                OrderEvent::class.java)
+        threadPoolTaskExecutor.execute(consumer)
+        return consumer
     }
+
+    @Bean
+    fun orderEventListener(bookingEventProducer: EventProducer<BookingEvent>,
+                           clock: Clock): EventListener<OrderEvent> = OrderEventListener(bookingEventProducer, clock)
 
     @Bean
     fun clock() = Clock.system(ZoneId.of("UTC"))

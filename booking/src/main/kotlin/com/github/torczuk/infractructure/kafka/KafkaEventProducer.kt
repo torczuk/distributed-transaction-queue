@@ -15,6 +15,7 @@ class KafkaEventProducer<in T : Event>(config: ProducerConfiguration,
     val log = LoggerFactory.getLogger(KafkaEventProducer::class.java)
 
     override fun publish(event: T) {
+        log.info("publishing on {}:  {}", topic, event);
         producer.send(ProducerRecord(topic, event.transaction, objectMapper.writeValueAsString(event)))
         log.info("published on {}:  {}", topic, event);
     }

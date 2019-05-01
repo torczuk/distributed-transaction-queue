@@ -3,7 +3,8 @@ package com.github.torczuk
 import com.github.torczuk.domain.*
 import com.github.torczuk.util.Stubs.Companion.uuid
 import org.awaitility.Awaitility.await
-import org.awaitility.Duration.*
+import org.awaitility.Duration.ONE_SECOND
+import org.awaitility.Duration.TEN_SECONDS
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -54,7 +55,6 @@ internal class KafkaProducerConsumerIntegrationTest(
     }
 
     @Test
-    @Disabled("Introduce order, payment consumers")
     fun `created booking event should be cancelled by cancelled order event`() {
         val transactionId = uuid()
         val createdBookingEvent = BookingEvent(transactionId, timestamp = now().toEpochMilli())

@@ -8,7 +8,7 @@ import java.util.function.Consumer
 
 class KafkaEventConsumer<T : Event>(private val listener: Consumer<T>,
                                     config: ConsumerConfiguration,
-                                    val objectMapper: ObjectMapper,
+                                    private val objectMapper: ObjectMapper,
                                     private val topic: String,
                                     val clazz: Class<out T>) : Runnable {
     val log = LoggerFactory.getLogger(KafkaEventConsumer::class.java)
