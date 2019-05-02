@@ -36,15 +36,12 @@ internal class KafkaProducerConsumerIntegrationTest(
     }
 
     @Test
-    @Disabled("Introduce order, payment consumers")
-    fun `created booking event should be confirmed by both order and payment events`() {
+    fun `created booking event should be confirmed by confirmed payment`() {
         val transactionId = uuid()
         val createdBookingEvent = BookingEvent(transactionId, timestamp = now().toEpochMilli())
-        val createdOrderEvent = OrderEvent(transactionId, timestamp = now().toEpochMilli())
-        val createdPaymentEvent = PaymentEvent(transactionId, timestamp = now().toEpochMilli())
+        val createdPaymentEvent = PaymentEvent(transactionId, "confirmed", timestamp = now().toEpochMilli())
 
         bookingEventProducer.publish(createdBookingEvent)
-        orderEventProducer.publish(createdOrderEvent)
         paymentEventProducer.publish(createdPaymentEvent)
 
         await("confirmed booking is persisted").pollDelay(ONE_SECOND).atMost(TEN_SECONDS).until {

@@ -15,5 +15,9 @@ class PaymentEventListener(
             log.info("cancelling booking, because of: {}", event)
             bookingEventProducer.publish(BookingEvent(event.transaction, "cancelled", clock.millis()))
         }
+        if (event.type == "confirmed") {
+            log.info("confirmed booking, because of: {}", event)
+            bookingEventProducer.publish(BookingEvent(event.transaction, "confirmed", clock.millis()))
+        }
     }
 }
