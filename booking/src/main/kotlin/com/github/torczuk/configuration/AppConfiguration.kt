@@ -32,8 +32,8 @@ class AppConfiguration {
     @Bean
     fun kafkaThreadExecutor(): ThreadPoolTaskExecutor {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 2
-        executor.maxPoolSize = 2
+        executor.corePoolSize = 3
+        executor.maxPoolSize = 3
         executor.setThreadNamePrefix("kafka_listener")
         executor.initialize()
         return executor
@@ -71,6 +71,24 @@ class AppConfiguration {
     @Bean
     fun orderEventListener(bookingEventProducer: EventProducer<BookingEvent>,
                            clock: Clock): EventListener<OrderEvent> = OrderEventListener(bookingEventProducer, clock)
+
+    @Bean
+    fun kafkaPaymentEventConsumer(paymentEventListener: EventListener<PaymentEvent>,
+                                  objectMapper: ObjectMapper,
+                                  threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<PaymentEvent> {
+        val consumer = KafkaEventConsumer(paymentEventListener,
+                ConsumerConfiguration(),
+                objectMapper,
+                "payment_events",
+                PaymentEvent::class.java)
+        threadPoolTaskExecutor.execute(consumer)
+        return consumer
+    }
+
+    @Bean
+    fun paymentEventListener(bookingEventProducer: EventProducer<BookingEvent>,
+                             clock: Clock): EventListener<PaymentEvent> = PaymentEventListener(bookingEventProducer, clock)
+
 
     @Bean
     fun clock() = Clock.system(ZoneId.of("UTC"))

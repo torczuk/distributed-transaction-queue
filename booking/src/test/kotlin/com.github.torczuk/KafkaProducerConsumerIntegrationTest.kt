@@ -71,7 +71,6 @@ internal class KafkaProducerConsumerIntegrationTest(
     }
 
     @Test
-    @Disabled("Introduce order, payment consumers")
     fun `created booking event should be cancelled by cancelled payment event`() {
         val transactionId = uuid()
         val createdBookingEvent = BookingEvent(transactionId, timestamp = now().toEpochMilli())
