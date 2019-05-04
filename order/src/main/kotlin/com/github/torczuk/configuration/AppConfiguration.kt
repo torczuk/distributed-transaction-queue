@@ -2,10 +2,7 @@ package com.github.torczuk.configuration
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.github.torczuk.domain.EventListener
-import com.github.torczuk.domain.OrderEvent
-import com.github.torczuk.domain.OrderEventListener
-import com.github.torczuk.domain.OrderEventRepository
+import com.github.torczuk.domain.*
 import com.github.torczuk.infractructure.kafka.ConsumerConfiguration
 import com.github.torczuk.infractructure.kafka.KafkaEventConsumer
 import com.github.torczuk.infractructure.kafka.KafkaEventProducer
@@ -29,28 +26,44 @@ class AppConfiguration {
     }
 
     @Bean
-    fun orderEventProducer(objectMapper: ObjectMapper) = KafkaEventProducer(ProducerConfiguration(), "order_events", objectMapper)
+    fun orderEventProducer(objectMapper: ObjectMapper) = KafkaEventProducer<OrderEvent>(ProducerConfiguration(), "order_events", objectMapper)
 
     @Bean
     fun kafkaThreadExecutor(): ThreadPoolTaskExecutor {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 1
-        executor.maxPoolSize = 1
+        executor.corePoolSize = 2
+        executor.maxPoolSize = 2
         executor.setThreadNamePrefix("kafka_listener")
         executor.initialize()
         return executor
     }
 
     @Bean
-    fun kafkaEventConsumer(listener: EventListener<OrderEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer {
-        val consumer = KafkaEventConsumer(listener, ConsumerConfiguration(), objectMapper, "order_events")
+    fun kafkaBookingEventConsumer(bookingEventListener: EventListener<BookingEvent>,
+                                  objectMapper: ObjectMapper,
+                                  threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<BookingEvent> {
+        val consumer = KafkaEventConsumer(bookingEventListener,
+                ConsumerConfiguration(),
+                objectMapper,
+                "booking_events",
+                BookingEvent::class.java)
         threadPoolTaskExecutor.execute(consumer)
         return consumer
     }
 
     @Bean
-    fun listener(orderEventRepository: OrderEventRepository): EventListener<OrderEvent> {
-        return OrderEventListener(orderEventRepository)
+    fun bookingEventListener(): EventListener<BookingEvent> = BookingEventListener()
+
+    @Bean
+    fun kafkaOrderEventConsumer(orderEventListener: EventListener<OrderEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<OrderEvent> {
+        val consumer = KafkaEventConsumer(orderEventListener, ConsumerConfiguration(), objectMapper, "order_events", OrderEvent::class.java)
+        threadPoolTaskExecutor.execute(consumer)
+        return consumer
+    }
+
+    @Bean
+    fun orderEventListener(orderEventRepository: OrderEventRepository, clock: Clock, orderEventProducer: KafkaEventProducer<OrderEvent>): EventListener<OrderEvent> {
+        return OrderEventListener(orderEventRepository, orderEventProducer, clock)
     }
 
     @Bean

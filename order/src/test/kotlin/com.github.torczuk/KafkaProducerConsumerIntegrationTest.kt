@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
+import org.springframework.test.context.TestContext
 import java.time.Instant
 
-@SpringBootTest(webEnvironment = RANDOM_PORT)
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = [TestAppContext::class])
 internal class KafkaProducerConsumerIntegrationTest(
-        @Autowired val publisher: EventProducer<OrderEvent>,
+        @Autowired val orderEventProducer: EventProducer<OrderEvent>,
         @Autowired val orderEventRepository: OrderEventRepository
 ) {
     private val log = LoggerFactory.getLogger(KafkaProducerConsumerIntegrationTest::class.java)
@@ -27,7 +28,7 @@ internal class KafkaProducerConsumerIntegrationTest(
         val event = OrderEvent(transaction = uuid(), timestamp = now)
         log.info("publishing $event")
 
-        publisher.publish(event)
+        orderEventProducer.publish(event)
 
         await("published event is consumed and persisted").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
             log.info("consumed events: {}", orderEventRepository.findAll())
