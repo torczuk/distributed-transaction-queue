@@ -4,10 +4,11 @@ import org.slf4j.LoggerFactory
 import java.time.Clock
 
 class OrderEventListener(
-        val orderEventRepository: OrderEventRepository,
-        val orderEventProducer: EventProducer<OrderEvent>,
-        val clock: Clock) : EventListener<OrderEvent> {
-    val log = LoggerFactory.getLogger(OrderEventListener::class.java)
+        private val orderEventRepository: OrderEventRepository,
+        private val orderEventProducer: EventProducer<OrderEvent>,
+        private val clock: Clock) : EventListener<OrderEvent> {
+
+    private val log = LoggerFactory.getLogger(OrderEventListener::class.java)
 
     override fun accept(event: OrderEvent) {
         log.info("processing {} ...", event)
