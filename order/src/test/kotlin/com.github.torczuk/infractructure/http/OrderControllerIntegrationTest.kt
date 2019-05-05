@@ -8,8 +8,8 @@ import com.github.torczuk.domain.EventProducer
 import com.github.torczuk.util.HttpTest
 import com.github.torczuk.util.Stubs.Companion.uuid
 import org.awaitility.Awaitility.await
-import org.awaitility.Duration
-import org.junit.jupiter.api.Disabled
+import org.awaitility.Duration.ONE_MINUTE
+import org.awaitility.Duration.ONE_SECOND
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,13 +30,12 @@ class OrderControllerIntegrationTest(
     private val log = LoggerFactory.getLogger(OrderControllerIntegrationTest::class.java)
 
     @Test
-    @Disabled("Remove annotation after implementing BookingEventListener...")
     fun `booking event published should be processed and eventually available by GET`() {
         val transaction = uuid()
         log.info("Publishing $transaction ...")
         bookingEventProducer.publish(BookingEvent(transaction = transaction, timestamp = clock.millis()))
 
-        await("posted transaction is available").pollDelay(Duration.ONE_SECOND).atMost(Duration.ONE_MINUTE).until {
+        await("posted transaction is available").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
             val statuses = GET("api/v1/orders/$transaction")
             log.info("status for {}: {}", transaction, statuses.body)
             containsTransaction(statuses.body, transaction)

@@ -1,8 +1,13 @@
 package com.github.torczuk.domain
 
-class BookingEventListener : EventListener<BookingEvent> {
+import java.time.Clock
 
-    override fun accept(t: BookingEvent) {
-        TODO("not implemented")
+class BookingEventListener(val orderEventPublisher: EventProducer<OrderEvent>,
+                           val clock: Clock) : EventListener<BookingEvent> {
+
+    override fun accept(event: BookingEvent) {
+        if (event.type == "created") {
+            orderEventPublisher.publish(OrderEvent(event.transaction, "created", clock.millis()))
+        }
     }
 }

@@ -52,7 +52,7 @@ class AppConfiguration {
     }
 
     @Bean
-    fun bookingEventListener(): EventListener<BookingEvent> = BookingEventListener()
+    fun bookingEventListener(orderEventProducer: KafkaEventProducer<OrderEvent>, clock: Clock): EventListener<BookingEvent> = BookingEventListener(orderEventProducer, clock)
 
     @Bean
     fun kafkaOrderEventConsumer(orderEventListener: EventListener<OrderEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<OrderEvent> {
