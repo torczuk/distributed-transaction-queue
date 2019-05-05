@@ -1,0 +1,4 @@
+application:
+  file-based-db:
+    path: /tmp/test/db/payments
+spring.main.allow-bean-definition-overriding:   true
