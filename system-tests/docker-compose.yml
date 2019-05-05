@@ -36,3 +36,29 @@ services:
     - "kafka"
     links:
     - kafka
+  order:
+    container_name: system_test_order
+    build:
+      context: ../order/
+    ports:
+    - "8081:8080"
+    environment:
+    - KAFKA_SERVER=kafka:9092
+    command: java -jar order.jar
+    depends_on:
+    - "kafka"
+    links:
+    - kafka
+  payment:
+    container_name: system_test_payment
+    build:
+      context: ../payment/
+    ports:
+    - "8082:8080"
+    environment:
+    - KAFKA_SERVER=kafka:9092
+    command: java -jar payment.jar
+    depends_on:
+    - "kafka"
+    links:
+    - kafka

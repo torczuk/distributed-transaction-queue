@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.torczuk.domain.BookingEvent
 import org.assertj.core.api.Assertions.assertThat
-import org.awaitility.Awaitility
-import org.awaitility.Duration
+import org.awaitility.Awaitility.await
+import org.awaitility.Duration.ONE_MINUTE
+import org.awaitility.Duration.ONE_SECOND
+import org.junit.jupiter.api.Disabled
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -25,22 +27,22 @@ internal class DistributedTxtSystemTest(
     private val log = LoggerFactory.getLogger(DistributedTxtSystemTest::class.java)
 
     @SystemTest
-    fun `should book successfully order when both components are are available`() {
+    fun `distributed transaction should run successfully when all components are up and running`() {
         //given all components up and running
         //TODO check status
 
         //when
-        val transaction = UUID.randomUUID().toString()
-        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
+        val transactionId = UUID.randomUUID().toString()
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
 
-
-        Awaitility.await("posted transaction is available").pollDelay(Duration.ONE_SECOND).atMost(Duration.ONE_MINUTE).until {
+        await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
             val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
-            log.info("status for {}: {}", transaction, statuses.body)
-            containsTransaction(statuses.body, transaction)
+            log.info("status for {}: {}", transactionId, statuses.body)
+            isConfirmed(statuses.body, transactionId)
         }
     }
 
+    @Disabled("Remove when api for pausing component is ready")
     @SystemTest
     fun `should book successfully order even when payment component is not available for defined number of time`() {
         //given all components but payment up and running
@@ -59,6 +61,7 @@ internal class DistributedTxtSystemTest(
         assertThat(response.body).isEqualTo("""{"status": "success"}""".trimIndent())
     }
 
+    @Disabled("Remove when api for pausing component is ready")
     @SystemTest
     fun `should book successfully order even when inventory component is not available for defined number of time`() {
         //given all components but storage up and running
@@ -90,10 +93,10 @@ internal class DistributedTxtSystemTest(
 
     private fun location(body: String?) = objectMapper.readValue<Map<String, String>>(body!!)["location"]!!
 
-    private fun containsTransaction(body: String?, transactionId: String): Boolean {
+    private fun isConfirmed(body: String?, transactionId: String): Boolean {
         val bookings: List<BookingEvent> = objectMapper.readValue(body!!)
         return bookings.filter { event -> event.transaction == transactionId }
-                .filter {event -> event.type == "success" }
+                .filter { event -> event.type == "confirmed" }
                 .any()
     }
 }

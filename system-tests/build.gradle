@@ -22,7 +22,7 @@ apply plugin: 'io.spring.dependency-management'
 
 
 dependencies {
-    implementation project(':booking')
+    implementation project(':domain')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -48,6 +48,8 @@ systemTest {
 dockerCompose {
     captureContainersOutput = false
     forceRecreate = true
+//    stopContainers = false
+//    removeContainers = false
 }
 
 check.dependsOn systemTest
