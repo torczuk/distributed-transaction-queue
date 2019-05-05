@@ -11,7 +11,7 @@ class OrderEventListener(
 
     override fun accept(event: OrderEvent) {
         log.info("processing {} ...", event)
-        if (event.type == "created") {
+        if (event.type == "confirmed") {
             paymentEventPublisher.publish(PaymentEvent(event.transaction, "created", clock.millis()))
         }
     }

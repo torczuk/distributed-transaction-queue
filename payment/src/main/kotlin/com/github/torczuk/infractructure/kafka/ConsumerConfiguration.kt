@@ -9,7 +9,7 @@ class ConsumerConfiguration {
     fun properties(): Properties {
         val props = Properties()
         props.put("bootstrap.servers", bootstrapServer())
-        props.put("group.id", "order-component")
+        props.put("group.id", "payment-component")
         props.put("enable.auto.commit", "true")
         props.put("auto.commit.interval.ms", "1000")
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")

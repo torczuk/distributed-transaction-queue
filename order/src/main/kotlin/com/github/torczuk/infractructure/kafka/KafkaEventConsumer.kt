@@ -16,7 +16,7 @@ class KafkaEventConsumer<T : Event>(private val listener: Consumer<T>,
     val consumer = KafkaConsumer<String, String>(config.properties())
 
     override fun run() {
-        log.info("started listening on {} ... ", topic)
+        log.info("started listening on {} thread: {} ... ", topic, Thread.currentThread().name)
         consumer.subscribe(listOf(topic))
         while (true) {
             val records = consumer.poll(100)

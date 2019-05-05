@@ -3,14 +3,13 @@ package com.github.torczuk.infractructure.http
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.torczuk.TestAppContext
-import com.github.torczuk.domain.PaymentEvent
 import com.github.torczuk.domain.EventProducer
 import com.github.torczuk.domain.OrderEvent
+import com.github.torczuk.domain.PaymentEvent
 import com.github.torczuk.util.HttpTest
 import com.github.torczuk.util.Stubs.Companion.uuid
 import org.awaitility.Awaitility.await
-import org.awaitility.Duration.ONE_MINUTE
-import org.awaitility.Duration.ONE_SECOND
+import org.awaitility.Duration.*
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,9 +33,9 @@ class PaymentControllerIntegrationTest(
     fun `order event published should be processed and eventually available by GET`() {
         val transaction = uuid()
         log.info("Publishing $transaction ...")
-        orderEventProducer.publish(OrderEvent(transaction = transaction, timestamp = clock.millis()))
+        orderEventProducer.publish(OrderEvent(transaction, "confirmed", clock.millis()))
 
-        await("posted payment transaction is available").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+        await("posted payment transaction is available").pollDelay(ONE_SECOND).atMost(TEN_SECONDS).until {
             val statuses = GET("api/v1/payments/$transaction")
             log.info("status for {}: {}", transaction, statuses.body)
             containsTransaction(statuses.body, transaction)

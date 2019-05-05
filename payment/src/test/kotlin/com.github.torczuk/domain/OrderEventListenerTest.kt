@@ -18,9 +18,9 @@ internal class OrderEventListenerTest {
 
 
     @Test
-    internal fun `should transform created order event to created payment event`() {
+    internal fun `should transform confirmed order event to created payment event`() {
         val transaction = uuid()
-        val createdOrderEvent = OrderEvent(transaction, "created", clock.millis())
+        val createdOrderEvent = OrderEvent(transaction, "confirmed", clock.millis())
 
         orderEventListener.accept(createdOrderEvent)
 
@@ -29,8 +29,8 @@ internal class OrderEventListenerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["confirmed", "cancelled", "any other"])
-    internal fun `should ignore any other types like confirmed or cancelled`(type: String) {
+    @ValueSource(strings = ["created", "cancelled", "any other"])
+    internal fun `should ignore any other types like created or cancelled`(type: String) {
         val orderEvent = OrderEvent(uuid(), type, clock.millis())
 
         orderEventListener.accept(orderEvent)
