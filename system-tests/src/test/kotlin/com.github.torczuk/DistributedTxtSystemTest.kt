@@ -2,37 +2,36 @@ package com.github.torczuk
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.github.torczuk.docker.Docker
 import com.github.torczuk.domain.BookingEvent
-import org.assertj.core.api.Assertions.assertThat
+import com.github.torczuk.util.Stubs.Companion.uuid
 import org.awaitility.Awaitility.await
 import org.awaitility.Duration.ONE_MINUTE
 import org.awaitility.Duration.ONE_SECOND
-import org.junit.jupiter.api.Disabled
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
-import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 
 @SpringBootTest(classes = [Application::class])
 internal class DistributedTxtSystemTest(
         @Autowired val restTemplate: RestTemplate,
         @Autowired val objectMapper: ObjectMapper,
         @Value("\${system_test_booking.tcp.8080}") val bookingPort: String,
-        @Value("\${system_test_booking.host}") val bookingHost: String
+        @Value("\${system_test_booking.host}") val bookingHost: String,
+        @Autowired val docker: Docker
 ) {
 
     private val log = LoggerFactory.getLogger(DistributedTxtSystemTest::class.java)
 
     @SystemTest
     fun `distributed transaction should run successfully when all components are up and running`() {
-        //given all components up and running
-        //TODO check status
+        logContainers()
 
-        //when
-        val transactionId = UUID.randomUUID().toString()
+        val transactionId = uuid()
         val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
 
         await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
@@ -42,42 +41,36 @@ internal class DistributedTxtSystemTest(
         }
     }
 
-    @Disabled("Remove when api for pausing component is ready")
     @SystemTest
     fun `should book successfully order even when payment component is not available for defined number of time`() {
-        //given all components but payment up and running
-        //TODO check status
+        docker.pause("system_test_payment")
+        logContainers()
 
-        //when
-        val transaction = UUID.randomUUID().toString()
-        POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
-        //and
-        //payment component is up
+        val transactionId = uuid()
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
+        simulateUnavailability("system_test_payment")
 
-
-        //then
-        //TODO add avaitility
-        val response = GET("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
-        assertThat(response.body).isEqualTo("""{"status": "success"}""".trimIndent())
+        await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+            val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
+            log.info("status for {}: {}", transactionId, statuses.body)
+            isConfirmed(statuses.body, transactionId)
+        }
     }
 
-    @Disabled("Remove when api for pausing component is ready")
     @SystemTest
     fun `should book successfully order even when inventory component is not available for defined number of time`() {
-        //given all components but storage up and running
-        //TODO check status
+        docker.pause("system_test_order")
+        logContainers()
 
-        //when
-        val transaction = UUID.randomUUID().toString()
-        POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
-        //and
-        //storage component is up
+        val transactionId = uuid()
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
+        simulateUnavailability("system_test_order")
 
-
-        //then
-        //TODO add avaitility
-        val response = GET("http://$bookingHost:$bookingPort/api/v1/transaction/$transaction")
-        assertThat(response.body).isEqualTo("""{"status": "success"}""".trimIndent())
+        await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+            val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
+            log.info("status for {}: {}", transactionId, statuses.body)
+            isConfirmed(statuses.body, transactionId)
+        }
     }
 
     private fun POST(url: String): ResponseEntity<String> {
@@ -98,6 +91,20 @@ internal class DistributedTxtSystemTest(
         return bookings.filter { event -> event.transaction == transactionId }
                 .filter { event -> event.type == "confirmed" }
                 .any()
+    }
+
+    private fun logContainers() {
+        docker.containers().forEach { container ->
+            log.info("{}: status: {}", container.names.first(), container.status, container.state)
+        }
+    }
+
+    private fun simulateUnavailability(component: String) {
+        val sleepInterval = ThreadLocalRandom.current().nextLong(10, 60)
+        log.info("simulating payment unavailability for $sleepInterval sec ..")
+        Thread.sleep(sleepInterval * 1000)
+        docker.unpause("component")
+        log.info("continue ... ")
     }
 }
 

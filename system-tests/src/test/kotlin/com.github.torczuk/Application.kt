@@ -2,6 +2,7 @@ package com.github.torczuk
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.github.torczuk.docker.Docker
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.WebApplicationType
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -27,4 +28,7 @@ class Application {
         val objectMapper = ObjectMapper()
         objectMapper.registerModule(KotlinModule())
     }
+
+    @Bean
+    fun docker() = Docker
 }
