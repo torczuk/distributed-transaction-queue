@@ -10,22 +10,22 @@ TODO
 
 ## Testing
 
-Solution contains different types of tests. Unit, integration and system tests. Last two categories of tests use kafka, kafka + zookeeper, environment inside docker.
-Tests for `booking`, `order` and `payment` components are starting docker-compose before execution. Please take a look at the each `docker-compose.yml` in related module.
+Solution contains different types of tests. Unit, integration and system tests. Last two categories of tests use kafka infrastructure inside docker.
+Tests for `booking`, `order` and `payment` components are starting docker-compose before execution. Please take a look at the each `docker-compose.yml` in related module for more details.
 
-`system-tests` module is dedicated to verify *saga* against topology of example.
+`system-tests` module is dedicated to verify *saga* implementation against topology of components.
 It means, kafka, zookeeper and all three components are started together.
 Sample test looks like below.
 
 #### all components are up and running
 ```
-//given all components running
+//given all components are up & running
 
 //when transaction is started
 POST /api/v1/bookins/{transaction-id}
 
 //then
-wait until GET /api/v1/bookins/{transaction-id} contains confimend booking
+eventually after a quantum of time GET /api/v1/bookins/{transaction-id} will contain confimend booking
 ```
 
 
@@ -40,7 +40,7 @@ POST /api/v1/bookins/{transaction-id}
 ...
 
 //then
-wait until GET /api/v1/bookins/{transaction-id} contains confimend booking
+eventually after a quantum of time GET /api/v1/bookins/{transaction-id} will contain confimend booking
 ```
 
 #### payment failed - transaction must be rollbacked
@@ -54,7 +54,7 @@ POST /api/v1/bookins/{transaction-id}
 ...
 
 //then
-wait until GET /api/v1/bookins/{transaction-id} contains cancelled booking
+eventually after a quantum of time GET /api/v1/bookins/{transaction-id} will contain cancelled booking
 ```
 
 
