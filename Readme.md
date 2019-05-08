@@ -5,8 +5,8 @@ TODO
 
 
 ## Big picture
-TODO
 
+![alt text](https://github.com/torczuk/distributed-transaction-saga/blob/master/img/successful_saga.png | width=100)
 
 ## Testing
 
