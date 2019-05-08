@@ -6,7 +6,7 @@ TODO
 
 ## Big picture
 
-![alt text](/img/successful_saga.png?raw=true | width=100)
+![successful](img/successful_saga.png?raw=true | width=100)
 
 ## Testing
 
