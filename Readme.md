@@ -1,8 +1,11 @@
 # Distributed transaction - Saga
 
 ## Problem
-TODO
-
+How would you model distributed transaction where steps (transactions) are sequential, and current state depends on before.
+e.g. you are buying tickets to cinema. If you select places and next during payment you are run ot of money, booked sits should
+return to the common pool and be available. Bossiness logic responsible for booking sits is handled by different process than payment.
+They are deployed on different hosts, possibly different availability zones.
+Saga for the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
 
 ## Big picture
 
