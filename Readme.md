@@ -18,43 +18,45 @@ It means, kafka, zookeeper and all three components are started together.
 Sample test looks like below.
 
 #### all components are up and running
-```
-//given all components are up & running
+```kotlin
+    @SystemTest
+    fun `distributed transaction should run successfully when all components are up and running`() {
+        logContainers()
 
-//when transaction is started
-POST /api/v1/bookins/{transaction-id}
+        val transactionId = uuid()
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
 
-//then
-eventually after a quantum of time GET /api/v1/bookins/{transaction-id} will contain confimend booking
+        await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+            val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
+            log.info("status for {}: {}", transactionId, statuses.body)
+            isConfirmed(statuses.body, transactionId)
+        }
+    }
 ```
 
 
 #### one component is unavailable
-```
-//given all components running except payment
+```kotlin
+    @SystemTest
+    fun `should book successfully order even when payment component is not available for defined number of time`() {
+        docker.pause("system_test_payment")
+        logContainers()
 
-//when transaction is started
-POST /api/v1/bookins/{transaction-id}
+        val transactionId = uuid()
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
+        simulateUnavailability("system_test_payment")
 
-// and when payment is startig recovery
-...
-
-//then
-eventually after a quantum of time GET /api/v1/bookins/{transaction-id} will contain confimend booking
+        await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+            val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
+            log.info("status for {}: {}", transactionId, statuses.body)
+            isConfirmed(statuses.body, transactionId)
+        }
+    }
 ```
 
 #### payment failed - transaction must be rollbacked
 ```
-//given all components running except payment
-
-//when transaction is started
-POST /api/v1/bookins/{transaction-id}
-
-// and when payment has failed
-...
-
-//then
-eventually after a quantum of time GET /api/v1/bookins/{transaction-id} will contain cancelled booking
+TODO
 ```
 
 
