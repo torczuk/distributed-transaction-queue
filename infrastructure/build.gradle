@@ -1,0 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'kotlin-allopen'
+
+dependencies {
+    implementation project(':domain')
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation group: 'org.apache.kafka', name: 'kafka-clients', version: '1.1.1'
+}

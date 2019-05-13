@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.github.torczuk.domain.*
 import com.github.torczuk.infractructure.kafka.ConsumerConfiguration
-import com.github.torczuk.infractructure.kafka.KafkaEventConsumer
 import com.github.torczuk.infractructure.kafka.KafkaEventProducer
 import com.github.torczuk.infractructure.kafka.ProducerConfiguration
+import com.github.torczuk.infrastructure.KafkaEventConsumer
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -43,7 +43,7 @@ class AppConfiguration {
                                 objectMapper: ObjectMapper,
                                 threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<OrderEvent> {
         val consumer = KafkaEventConsumer(orderEventListener,
-                ConsumerConfiguration(),
+                ConsumerConfiguration().properties(),
                 objectMapper,
                 "order_events",
                 OrderEvent::class.java)
@@ -57,7 +57,7 @@ class AppConfiguration {
     @Bean
     fun kafkaPaymentEventConsumer(paymentEventListener: EventListener<PaymentEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<PaymentEvent> {
         val consumer = KafkaEventConsumer(paymentEventListener,
-                ConsumerConfiguration(),
+                ConsumerConfiguration().properties(),
                 objectMapper,
                 "payment_events",
                 PaymentEvent::class.java)
