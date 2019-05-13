@@ -7,7 +7,7 @@ Example: you are buying tickets to cinema. If you select places and next during 
 
 Bussiness logic responsible for booking sits is handled by different process than payment.
 Components are deployed on different hosts, possibly different availability zones.
-Saga for the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
+Saga to the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
 
 ## Big picture
 
