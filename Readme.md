@@ -21,7 +21,7 @@ Saga for the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading
 ├── domain
 ├── infrastructure                                    - boilerplate infra code for all components
 ├── order                                             - component responsible for place an order
-├── payment                                           - component responsible for place an order
+├── payment                                           - component responsible for place an payment
 └── system-tests                                      - end to end tests: happy path & fail cases scenarios
 ```
 
