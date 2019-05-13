@@ -103,7 +103,7 @@ internal class DistributedTxtSystemTest(
         val sleepInterval = ThreadLocalRandom.current().nextLong(10, 60)
         log.info("simulating payment unavailability for $sleepInterval sec ..")
         Thread.sleep(sleepInterval * 1000)
-        docker.unpause("component")
+        docker.unpause(component)
         log.info("continue ... ")
     }
 }
