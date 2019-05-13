@@ -13,6 +13,19 @@ Saga for the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading
 
 ![successful](https://raw.githubusercontent.com/torczuk/distributed-transaction-saga/master/img/successful_saga.png)
 
+## Structure & modules
+
+```
+...
+├── booking                                           - component responsible for starting saga
+├── domain
+├── infrastructure                                    - boilerplate infra code for all components
+├── order                                             - component responsible for place an order
+├── payment                                           - component responsible for place an order
+└── system-tests                                      - end to end tests: happy path & fail cases scenarios
+```
+
+
 ## Testing
 
 Run this command before
