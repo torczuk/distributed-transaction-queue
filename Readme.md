@@ -3,7 +3,7 @@
 ## Problem
 How would you model distributed transaction where steps (transactions) are sequential, and current state depends on before?
 
-Example: you are buying tickets to cinema. If you select places and next during payment you are run ot of money, booked sits should return to the common pool and be available. 
+Example: you are buying tickets to cinema. If you select places and next during payment you are run ot of money, booked sits should return to the common pool and be available.
 
 Bussiness logic responsible for booking sits is handled by different process than payment.
 Components are deployed on different hosts, possibly different availability zones.
@@ -14,6 +14,14 @@ Saga for the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading
 ![successful](https://raw.githubusercontent.com/torczuk/distributed-transaction-saga/master/img/successful_saga.png)
 
 ## Testing
+
+Run this command before
+```bash
+mkdir -p /tmp/test/db/bookings \
+         /tmp/test/db/orders \
+         /tmp/test/db/payments
+```
+
 
 Solution contains different types of tests. Unit, integration and system tests. Last two categories of tests use kafka infrastructure inside docker.
 Tests for `booking`, `order` and `payment` components are starting docker-compose before execution. Please take a look at the each `docker-compose.yml` in related module for more details.
