@@ -25,6 +25,14 @@ Saga to the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading/
 └── system-tests                                      - end to end tests: happy path & fail cases scenarios
 ```
 
+Transactional components - `booking`,  `order` and `payment` communicate using apache kafka by sending an event
+* created
+* confirmed
+* cancelled
+
+Any cancell event should rollback saga. It means - if payment can not compleated it emites `cancel event` and previous commited transactions, in this case order and booking, will be **rollbacked**
+
+In order to simplify *side effect* as much as possible **transaction** in this example is just creation a json file on disc
 
 ## Testing
 
