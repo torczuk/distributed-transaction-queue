@@ -24,8 +24,8 @@ internal class DistributedTxtSystemTest(
         @Value("\${system_test_booking.host}") val bookingHost: String,
         @Autowired val docker: Docker
 ) {
-    private val MIN_UNAVAILABILITY_TIME_IN_SEC = 5L
-    private val MAX_UNAVAILABILITY_TIME_IN_SEC = 10L
+    private val MIN_UNAVAILABILITY_TIME_IN_SEC = 2L
+    private val MAX_UNAVAILABILITY_TIME_IN_SEC = 6L
 
     private val log = LoggerFactory.getLogger(DistributedTxtSystemTest::class.java)
 
