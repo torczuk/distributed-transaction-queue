@@ -124,7 +124,7 @@ or one by one
 
 All components must be build before running this comand
 ```
-./gradlew clean :booking:build systemTest --info
+./gradlew clean :infrastructure:build :booking:build :order:build :payment:build :booking:build systemTest --info
 ```
 
 
