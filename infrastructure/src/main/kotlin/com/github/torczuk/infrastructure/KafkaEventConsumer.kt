@@ -19,13 +19,19 @@ class KafkaEventConsumer<T : Event>(private val listener: Consumer<T>,
     override fun run() {
         log.info("started listening on {} ... ", topic)
         consumer.subscribe(listOf(topic))
-        while (true) {
-            val records = consumer.poll(100)
-            records.forEach { record ->
-                log.info("accepting: {}, key: {}, value: {}", record.offset(), record.key(), record.value())
-                val event = objectMapper.readValue(record.value(), clazz);
-                listener.accept(event)
+        try {
+            while (true) {
+                val records = consumer.poll(100)
+                records.forEach { record ->
+                    log.info("accepting: {}, key: {}, value: {}", record.offset(), record.key(), record.value())
+                    val event = objectMapper.readValue(record.value(), clazz);
+                    listener.accept(event)
+                    consumer.commitSync()
+                }
             }
+        } catch (e: RuntimeException) {
+            log.error("closing consumer on: ${topic}", e)
+            consumer.close()
         }
     }
 }

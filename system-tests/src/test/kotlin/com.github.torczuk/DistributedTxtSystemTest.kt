@@ -24,6 +24,8 @@ internal class DistributedTxtSystemTest(
         @Value("\${system_test_booking.host}") val bookingHost: String,
         @Autowired val docker: Docker
 ) {
+    private val MIN_UNAVAILABILITY_TIME_IN_SEC = 5L
+    private val MAX_UNAVAILABILITY_TIME_IN_SEC = 10L
 
     private val log = LoggerFactory.getLogger(DistributedTxtSystemTest::class.java)
 
@@ -100,9 +102,9 @@ internal class DistributedTxtSystemTest(
     }
 
     private fun simulateUnavailability(component: String) {
-        val sleepInterval = ThreadLocalRandom.current().nextLong(10, 60)
+        val sleepInterval = ThreadLocalRandom.current().nextLong(MIN_UNAVAILABILITY_TIME_IN_SEC, MAX_UNAVAILABILITY_TIME_IN_SEC)
         log.info("simulating payment unavailability for $sleepInterval sec ..")
-        Thread.sleep(sleepInterval * 1000)
+        Thread.sleep(sleepInterval * ONE_SECOND.valueInMS)
         docker.unpause(component)
         log.info("continue ... ")
     }

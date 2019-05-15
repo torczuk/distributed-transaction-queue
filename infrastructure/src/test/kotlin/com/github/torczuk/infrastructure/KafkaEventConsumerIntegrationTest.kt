@@ -28,7 +28,6 @@ internal class KafkaEventConsumerIntegrationTest(
     private val threadPoolExecutor = Executors.newFixedThreadPool(2)
 
     @Test
-    @Disabled("Uncomment after making consumer transactional")
     internal fun `should be transactional, means any exception thrown while processing event should move back event to topic`() {
         val event = BookingEvent(uuid())
         val json = objectMapper.writeValueAsString(event)
@@ -69,7 +68,6 @@ internal class KafkaEventConsumerIntegrationTest(
         props.put("bootstrap.servers", "localhost:9092")
         props.put("group.id", "transactional-consumer")
         props.put("enable.auto.commit", "false")
-        props.put("auto.commit.interval.ms", "1000")
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
