@@ -16,18 +16,18 @@ import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.server.LocalServerPort
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class TransactionControllerIntegrationTest(
+class BookingControllerIntegrationTest(
         @Autowired override val restTemplate: TestRestTemplate,
         @LocalServerPort override val serverPort: Int,
         @Autowired val objectMapper: ObjectMapper) : HttpTest {
 
-    private val log = LoggerFactory.getLogger(TransactionControllerIntegrationTest::class.java)
+    private val log = LoggerFactory.getLogger(BookingControllerIntegrationTest::class.java)
 
     @Test
-    fun `transaction POSTed on the transaction endpoint should eventually be available by GET`() {
+    fun `transaction POSTed on the booking endpoint should eventually be available by GET`() {
         val transaction = uuid()
         log.info("POST $transaction ...")
-        val response = POST("/api/v1/transaction/$transaction")
+        val response = POST("/api/v1/bookings/$transaction")
 
         await("posted transaction is available").pollDelay(Duration.ONE_SECOND).atMost(Duration.ONE_MINUTE).until {
             val statuses = GET(location(response.body))

@@ -58,7 +58,7 @@ Sample test looks like below.
         logContainers()
 
         val transactionId = uuid()
-        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/bookings/$transactionId")
 
         await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
             val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
@@ -77,7 +77,7 @@ Sample test looks like below.
         logContainers()
 
         val transactionId = uuid()
-        val response = POST("http://$bookingHost:$bookingPort/api/v1/transaction/$transactionId")
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/bookings/$transactionId")
         simulateUnavailability("system_test_payment")
 
         await("booking is confirmed").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {

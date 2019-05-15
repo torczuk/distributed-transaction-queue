@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*
 import java.time.Clock
 
 @RestController
-@RequestMapping(path = ["api/v1/transaction"])
-class TransactionController(@Autowired val bookingEventRepository: BookingEventRepository,
-                            @Autowired val eventProducer: EventProducer<BookingEvent>,
-                            @Autowired val clock: Clock) {
+@RequestMapping(path = ["api/v1/bookings"])
+class BookingController(@Autowired val bookingEventRepository: BookingEventRepository,
+                        @Autowired val eventProducer: EventProducer<BookingEvent>,
+                        @Autowired val clock: Clock) {
 
     @PostMapping(path = ["/{id}"])
     fun processTransaction(@PathVariable("id") transactionId: String): ResponseEntity<String> {
-        val location = """{"location": "/api/v1/transaction/$transactionId"}"""
+        val location = """{"location": "/api/v1/bookings/$transactionId"}"""
         eventProducer.publish(BookingEvent(transaction = transactionId, timestamp = clock.millis()))
         return ResponseEntity.accepted().body(location)
     }

@@ -25,7 +25,7 @@ import java.time.Instant
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = [NoStartEventConsumer::class])
-class TransactionControllerTest(
+class BookingControllerTest(
         @Autowired override val restTemplate: TestRestTemplate,
         @LocalServerPort override val serverPort: Int,
         @Autowired val clock: Clock) : HttpTest {
@@ -36,23 +36,23 @@ class TransactionControllerTest(
     private lateinit var eventProducer: EventProducer<BookingEvent>
 
     @Test
-    fun shouldAcceptTransactionToBeProcessedAndResponseWithStatusLocation() {
-        val transaction = uuid()
+    fun `link to POSTed booking should be available in response under location key`() {
+        val transactionId = uuid()
 
-        val response = POST("/api/v1/transaction/$transaction")
+        val response = POST("/api/v1/bookings/$transactionId")
 
-        verify(eventProducer).publish(BookingEvent(transaction, "created", clock.millis()))
+        verify(eventProducer).publish(BookingEvent(transactionId, "created", clock.millis()))
         assertThat(response.statusCode).isEqualTo(ACCEPTED)
-        assertThat(response.body).isEqualTo("""{"location": "/api/v1/transaction/$transaction"}""".trimIndent())
+        assertThat(response.body).isEqualTo("""{"location": "/api/v1/bookings/$transactionId"}""".trimIndent())
     }
 
     @Test
-    fun shouldResponseTransactionStatus() {
+    fun `status of booking can be check by GET request`() {
         val transaction = uuid()
         val now = Instant.now().toEpochMilli()
         given(repository.findBy(transaction)).willReturn(listOf(BookingEvent(transaction, "created", now)))
 
-        val response = GET("/api/v1/transaction/$transaction")
+        val response = GET("/api/v1/bookings/$transaction")
 
         assertThat(response.statusCode).isEqualTo(OK)
         assertThat(response.body).isEqualTo("""[{"transaction":"$transaction","type":"created","timestamp":$now}]""".trimIndent())
