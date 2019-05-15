@@ -31,16 +31,14 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude module: 'junit'
     }
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.1.0'
 }
 
 dockerCompose {
     captureContainersOutput = false
     useComposeFiles = ['src/test/resources/docker-compose.yml']
-//    stopContainers = false
-//    removeContainers = false
+    stopContainers = true
+    removeContainers = true
 
 }
 
