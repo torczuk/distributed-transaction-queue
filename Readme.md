@@ -11,7 +11,11 @@ Saga to the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading/
 
 ## Big picture
 
+### Successfull saga
 ![successful](https://raw.githubusercontent.com/torczuk/distributed-transaction-saga/master/img/successful_saga.png)
+
+### Failed saga
+![failed](https://raw.githubusercontent.com/torczuk/distributed-transaction-saga/master/img/failed_saga.png)
 
 ## Structure & modules
 
