@@ -3,9 +3,9 @@
 ## Problem
 How would you model distributed transaction where steps (transactions) are sequential, and current state depends on before?
 
-Example: you are buying tickets to cinema. If you select places and next during payment you are run ot of money, booked sits should return to the common pool and be available.
+Example: you are buying tickets to cinema. If you select places and next during payment you run out of money, reserved seats should return to the common pool and be available.
 
-Bussiness logic responsible for booking sits is handled by different process than payment.
+Business logic responsible for booking seats is handled by different process from payment.
 Components are deployed on different hosts, possibly different availability zones.
 Saga to the rescue: [link](http://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
 
