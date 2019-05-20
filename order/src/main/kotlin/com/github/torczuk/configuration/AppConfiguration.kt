@@ -31,8 +31,8 @@ class AppConfiguration {
     @Bean
     fun kafkaThreadExecutor(): ThreadPoolTaskExecutor {
         val executor = ThreadPoolTaskExecutor()
-        executor.corePoolSize = 2
-        executor.maxPoolSize = 2
+        executor.corePoolSize = 3
+        executor.maxPoolSize = 3
         executor.setThreadNamePrefix("kafka_listener")
         executor.initialize()
         return executor
@@ -56,7 +56,11 @@ class AppConfiguration {
 
     @Bean
     fun kafkaOrderEventConsumer(orderEventListener: EventListener<OrderEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<OrderEvent> {
-        val consumer = KafkaEventConsumer(orderEventListener, ConsumerConfiguration().properties(), objectMapper, "order_events", OrderEvent::class.java)
+        val consumer = KafkaEventConsumer(orderEventListener,
+                ConsumerConfiguration().properties(),
+                objectMapper,
+                "order_events",
+                OrderEvent::class.java)
         threadPoolTaskExecutor.execute(consumer)
         return consumer
     }
@@ -64,6 +68,20 @@ class AppConfiguration {
     @Bean
     fun orderEventListener(orderEventRepository: OrderEventRepository, clock: Clock, orderEventProducer: KafkaEventProducer<OrderEvent>): EventListener<OrderEvent> {
         return OrderEventListener(orderEventRepository, orderEventProducer, clock)
+    }
+
+    @Bean
+    fun paymentEventListener(orderEventProducer: KafkaEventProducer<OrderEvent>, clock: Clock): EventListener<PaymentEvent> = PaymentEventListener(orderEventProducer, clock)
+
+    @Bean
+    fun kafkaPaymentEventConsumer(paymentEventListener: EventListener<PaymentEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor): KafkaEventConsumer<PaymentEvent> {
+        val consumer = KafkaEventConsumer(paymentEventListener,
+                ConsumerConfiguration().properties(),
+                objectMapper,
+                "payment_events",
+                PaymentEvent::class.java)
+        threadPoolTaskExecutor.execute(consumer)
+        return consumer
     }
 
     @Bean

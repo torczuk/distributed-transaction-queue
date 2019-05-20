@@ -1,9 +1,7 @@
 package com.github.torczuk
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.torczuk.domain.BookingEvent
-import com.github.torczuk.domain.EventListener
-import com.github.torczuk.domain.OrderEvent
+import com.github.torczuk.domain.*
 import com.github.torczuk.infractructure.kafka.ConsumerConfiguration
 import com.github.torczuk.infrastructure.KafkaEventConsumer
 import org.springframework.boot.test.context.TestConfiguration
@@ -30,6 +28,14 @@ class NoStartEventConsumer {
                     objectMapper,
                     "booking_events",
                     BookingEvent::class.java)
+
+    @Bean
+    fun kafkaPaymentEventConsumer(paymentEventListener: EventListener<PaymentEvent>, objectMapper: ObjectMapper, threadPoolTaskExecutor: ThreadPoolTaskExecutor) =
+            KafkaEventConsumer(paymentEventListener,
+                    ConsumerConfiguration().properties(),
+                    objectMapper,
+                    "payment_events",
+                    PaymentEvent::class.java)
 
     @Bean
     fun clock() = Clock.fixed(Instant.now(), ZoneId.of("UTC"))

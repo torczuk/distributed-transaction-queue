@@ -86,30 +86,28 @@ internal class DistributedTxtSystemTest(
         }
     }
 
-    @Test
-    @Disabled("enable when functionality is ready")
+    @SystemTest
     fun `should rollback saga across all components when payment emits cancel event`() {
         logContainers()
 
         val invalidPaymentId = id().toString()
         val response = POST("http://$bookingHost:$bookingPort/api/v1/bookings/$invalidPaymentId")
 
-
         await("payment is cancelled").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
-            val statuses = GET("http://$paymentHost:$paymentPort/${location(response.body)}")
+            val statuses = GET("http://$paymentHost:$paymentPort/api/v1/payments/$invalidPaymentId")
             log.info("status for {}: {}", invalidPaymentId, statuses.body)
-            isCanceled(statuses.body, invalidPaymentId)
+            isCancelled(statuses.body, invalidPaymentId)
         }
         await("order is cancelled").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
-            val statuses = GET("http://$orderHost:$orderPort/${location(response.body)}")
+            val statuses = GET("http://$orderHost:$orderPort/api/v1/orders/$invalidPaymentId")
             log.info("status for {}: {}", invalidPaymentId, statuses.body)
-            isCanceled(statuses.body, invalidPaymentId)
+            isCancelled(statuses.body, invalidPaymentId)
         }
 
         await("booking is cancelled").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
             val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
             log.info("status for {}: {}", invalidPaymentId, statuses.body)
-            isCanceled(statuses.body, invalidPaymentId)
+            isCancelled(statuses.body, invalidPaymentId)
         }
     }
 
@@ -133,10 +131,10 @@ internal class DistributedTxtSystemTest(
                 .any()
     }
 
-    private fun isCanceled(body: String?, transactionId: String): Boolean {
+    private fun isCancelled(body: String?, transactionId: String): Boolean {
         val transactions: List<BookingEvent> = objectMapper.readValue(body!!)
         return transactions.filter { event -> event.transaction == transactionId }
-                .filter { event -> event.type == "canceled" }
+                .filter { event -> event.type == "cancelled" }
                 .any()
     }
 

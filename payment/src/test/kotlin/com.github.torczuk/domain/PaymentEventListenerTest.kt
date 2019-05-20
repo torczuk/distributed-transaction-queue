@@ -42,14 +42,13 @@ internal class PaymentEventListenerTest {
     }
 
     @Test
-    @Disabled("enable when functionality is ready")
     fun `created event with invalid id should be converted to cancelled event`() {
         val invalidId = Stubs.id().toString()
         val invalidEvent = PaymentEvent(invalidId)
 
         paymentEventListener.accept(invalidEvent)
 
-        assertThat(producer.publishedEvents()).containsExactly(invalidEvent.copy(type = "cancelled"))
-        assertThat(paymentEventRepository.findAll()).isEmpty()
+        assertThat(producer.publishedEvents()).containsExactly(invalidEvent.copy(type = "cancelled", timestamp = clock.millis()))
+        assertThat(paymentEventRepository.findAll()).contains(invalidEvent)
     }
 }

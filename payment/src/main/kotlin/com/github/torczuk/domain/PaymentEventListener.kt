@@ -2,6 +2,7 @@ package com.github.torczuk.domain
 
 import org.slf4j.LoggerFactory
 import java.time.Clock
+import java.util.*
 
 class PaymentEventListener(
         private val paymentEventRepository: PaymentEventRepository,
@@ -14,7 +15,20 @@ class PaymentEventListener(
         log.info("processing {} ...", event)
         paymentEventRepository.save(event)
         if (event.type == "created") {
-            paymentEventProducer.publish(PaymentEvent(event.transaction, "confirmed", clock.millis()))
+            if (valid(event)) {
+                paymentEventProducer.publish(PaymentEvent(event.transaction, "confirmed", clock.millis()))
+            } else {
+                paymentEventProducer.publish(PaymentEvent(event.transaction, "cancelled", clock.millis()))
+            }
         }
+    }
+
+    private fun valid(event: PaymentEvent): Boolean {
+        try {
+            UUID.fromString(event.transaction)
+        } catch (ex: Exception) {
+            return false
+        }
+        return true
     }
 }

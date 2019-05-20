@@ -58,7 +58,7 @@ class FileBasedPaymentEventRepositoryTest {
     fun `should find event by transaction id`() {
         val transaction = uuid()
         val createdEvent = PaymentEvent(transaction)
-        val cancelledEvent = PaymentEvent(transaction, "canceled")
+        val cancelledEvent = PaymentEvent(transaction, "cancelled")
         repository.save(createdEvent)
         repository.save(cancelledEvent)
 
@@ -72,7 +72,7 @@ class FileBasedPaymentEventRepositoryTest {
     fun `should find all events`() {
         val transaction = uuid()
         val createdEvent = PaymentEvent(transaction)
-        val cancelledEvent = PaymentEvent(transaction, "canceled")
+        val cancelledEvent = PaymentEvent(transaction, "cancelled")
         val otherEvent = PaymentEvent(uuid())
         repository.save(createdEvent)
         repository.save(cancelledEvent)

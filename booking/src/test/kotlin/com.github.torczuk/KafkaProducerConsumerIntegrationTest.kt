@@ -67,21 +67,21 @@ internal class KafkaProducerConsumerIntegrationTest(
         }
     }
 
-    @Test
-    fun `created booking event should be cancelled by cancelled payment event`() {
-        val transactionId = uuid()
-        val createdBookingEvent = BookingEvent(transactionId, timestamp = now().toEpochMilli())
-        val createdOrderEvent = OrderEvent(transactionId, timestamp = now().toEpochMilli())
-        val cancelledPaymentEvent = PaymentEvent(transactionId, "cancelled", timestamp = now().toEpochMilli())
-
-        bookingEventProducer.publish(createdBookingEvent)
-        orderEventProducer.publish(createdOrderEvent)
-        paymentEventProducer.publish(cancelledPaymentEvent)
-
-        await("cancelled booking is persisted").pollDelay(ONE_SECOND).atMost(TEN_SECONDS).until {
-            log.info("consumed events: {}", bookingEventRepository.findAll())
-            bookingEventRepository.findBy(transactionId).none { event -> event.type == "confirmed" }
-                    && bookingEventRepository.findBy(transactionId).any { event -> event.type == "cancelled" }
-        }
-    }
+//    @Test
+//    fun `created booking event should be cancelled by cancelled payment event`() {
+//        val transactionId = uuid()
+//        val createdBookingEvent = BookingEvent(transactionId, timestamp = now().toEpochMilli())
+//        val createdOrderEvent = OrderEvent(transactionId, timestamp = now().toEpochMilli())
+//        val cancelledPaymentEvent = PaymentEvent(transactionId, "cancelled", timestamp = now().toEpochMilli())
+//
+//        bookingEventProducer.publish(createdBookingEvent)
+//        orderEventProducer.publish(createdOrderEvent)
+//        paymentEventProducer.publish(cancelledPaymentEvent)
+//
+//        await("cancelled booking is persisted").pollDelay(ONE_SECOND).atMost(TEN_SECONDS).until {
+//            log.info("consumed events: {}", bookingEventRepository.findAll())
+//            bookingEventRepository.findBy(transactionId).none { event -> event.type == "confirmed" }
+//                    && bookingEventRepository.findBy(transactionId).any { event -> event.type == "cancelled" }
+//        }
+//    }
 }
