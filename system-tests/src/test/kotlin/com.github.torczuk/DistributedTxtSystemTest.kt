@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.torczuk.docker.Docker
 import com.github.torczuk.domain.BookingEvent
+import com.github.torczuk.util.Stubs.Companion.id
 import com.github.torczuk.util.Stubs.Companion.uuid
 import org.awaitility.Awaitility.await
 import org.awaitility.Duration.ONE_MINUTE
 import org.awaitility.Duration.ONE_SECOND
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -20,8 +23,16 @@ import java.util.concurrent.ThreadLocalRandom
 internal class DistributedTxtSystemTest(
         @Autowired val restTemplate: RestTemplate,
         @Autowired val objectMapper: ObjectMapper,
+
         @Value("\${system_test_booking.tcp.8080}") val bookingPort: String,
         @Value("\${system_test_booking.host}") val bookingHost: String,
+
+        @Value("\${system_test_order.tcp.8080}") val orderPort: String,
+        @Value("\${system_test_order.host}") val orderHost: String,
+
+        @Value("\${system_test_payment.tcp.8080}") val paymentPort: String,
+        @Value("\${system_test_payment.host}") val paymentHost: String,
+
         @Autowired val docker: Docker
 ) {
     private val MIN_UNAVAILABILITY_TIME_IN_SEC = 2L
@@ -75,6 +86,33 @@ internal class DistributedTxtSystemTest(
         }
     }
 
+    @Test
+    @Disabled("enable when functionality is ready")
+    fun `should rollback saga across all components when payment emits cancel event`() {
+        logContainers()
+
+        val invalidPaymentId = id().toString()
+        val response = POST("http://$bookingHost:$bookingPort/api/v1/bookings/$invalidPaymentId")
+
+
+        await("payment is cancelled").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+            val statuses = GET("http://$paymentHost:$paymentPort/${location(response.body)}")
+            log.info("status for {}: {}", invalidPaymentId, statuses.body)
+            isCanceled(statuses.body, invalidPaymentId)
+        }
+        await("order is cancelled").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+            val statuses = GET("http://$orderHost:$orderPort/${location(response.body)}")
+            log.info("status for {}: {}", invalidPaymentId, statuses.body)
+            isCanceled(statuses.body, invalidPaymentId)
+        }
+
+        await("booking is cancelled").pollDelay(ONE_SECOND).atMost(ONE_MINUTE).until {
+            val statuses = GET("http://$bookingHost:$bookingPort/${location(response.body)}")
+            log.info("status for {}: {}", invalidPaymentId, statuses.body)
+            isCanceled(statuses.body, invalidPaymentId)
+        }
+    }
+
     private fun POST(url: String): ResponseEntity<String> {
         log.info("POST: $url")
         return restTemplate.postForEntity<String>(
@@ -89,9 +127,16 @@ internal class DistributedTxtSystemTest(
     private fun location(body: String?) = objectMapper.readValue<Map<String, String>>(body!!)["location"]!!
 
     private fun isConfirmed(body: String?, transactionId: String): Boolean {
-        val bookings: List<BookingEvent> = objectMapper.readValue(body!!)
-        return bookings.filter { event -> event.transaction == transactionId }
+        val transactions: List<BookingEvent> = objectMapper.readValue(body!!)
+        return transactions.filter { event -> event.transaction == transactionId }
                 .filter { event -> event.type == "confirmed" }
+                .any()
+    }
+
+    private fun isCanceled(body: String?, transactionId: String): Boolean {
+        val transactions: List<BookingEvent> = objectMapper.readValue(body!!)
+        return transactions.filter { event -> event.transaction == transactionId }
+                .filter { event -> event.type == "canceled" }
                 .any()
     }
 
