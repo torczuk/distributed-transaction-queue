@@ -16,9 +16,9 @@ class PaymentEventListener(
         paymentEventRepository.save(event)
         if (event.type == "created") {
             if (valid(event)) {
-                paymentEventProducer.publish(PaymentEvent(event.transaction, "confirmed", clock.millis()))
+                paymentEventProducer.publish(event.confirm(clock.millis()))
             } else {
-                paymentEventProducer.publish(PaymentEvent(event.transaction, "cancelled", clock.millis()))
+                paymentEventProducer.publish(event.cancel(clock.millis()))
             }
         }
     }

@@ -14,7 +14,7 @@ class OrderEventListener(
         log.info("processing {} ...", event)
         orderEventRepository.save(event)
         if (event.type == "created") {
-            orderEventProducer.publish(OrderEvent(event.transaction, "confirmed", clock.millis()))
+            orderEventProducer.publish(event.confirm(clock.millis()))
         }
     }
 }
